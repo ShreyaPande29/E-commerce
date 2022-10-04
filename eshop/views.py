@@ -16,15 +16,17 @@ def index(request):
 def SignUp(request):
     if request.method == "POST":
         form_register = SignUpForm(request.POST)
+        password = request.POST.get('password')
         if form_register.is_valid():
             
             # first_name = forms.cleaned_data
             # email = forms.cleaned_data.get('email')
             # raw_password = forms.cleaned_data.get('password')
             # user = authenticate(email=email, password=raw_password)
-            messages.success(request, "Account created successfully!")
-            form_register.save()
-            return redirect('login')
+            user=form_register.save()
+            user.set_password(password)
+            user.save()
+            return HttpResponseRedirect('/login/')
         # return render(request, '/eshop/login.html', {'form':forms} )
 
     else:
@@ -36,17 +38,14 @@ def SignUp(request):
 def user_login(request):
 
     if request.method == "POST":
-        form_login = AuthenticationForm(data= request.POST)
+        form_login = AuthenticationForm(request=request , data= request.POST)
         if form_login.is_valid():
-                # uname = fm.cleaned_data['username']
             uemail = form_login.cleaned_data['username']
             upass = form_login.cleaned_data['password']
             user = authenticate(username=uemail, password=upass)
-            user.set_password(upass)
             if user is not None:
                 login(request,user)
-                print("#3333333333333333",user)
-                return redirect('index', { 'form_login':form_login})
+                return HttpResponseRedirect('/')
     else:
         form_login  = AuthenticationForm()
 
@@ -107,4 +106,8 @@ def user_login(request):
 
         
 #     return render(request,'eshop/login.html',{'form':form})
+
+
+
+
 
